@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import { fetchUpdates } from "./utils/system"
 
 const app = express()
 const port = 3002
@@ -14,8 +15,10 @@ app.get("/reset", (request, response) => {
     response.json("Hello World")
 })
 
-app.get("/update", (request, response) => {
-    response.json("Hello World")
+app.get("/update", async (request, response) => {
+    const { stdout } = await fetchUpdates()
+
+    response.json(stdout)
 })
 
 app.listen(port, () => {
