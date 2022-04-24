@@ -1,7 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reloadProcessManager = exports.updateGitRepository = void 0;
+exports.reloadProcessManager = exports.updateGitRepository = exports.listProjectDirectories = void 0;
+const promises_1 = require("fs/promises");
 const execute_1 = require("../execute");
+const listProjectDirectories = async () => {
+    const files = await (0, promises_1.readdir)("/home/pi/RestNode");
+    return files;
+};
+exports.listProjectDirectories = listProjectDirectories;
 const updateGitRepository = async (target) => {
     let command = "git pull";
     if (target)

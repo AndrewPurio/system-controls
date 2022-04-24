@@ -1,4 +1,11 @@
+import { readdir } from "fs/promises"
 import { execute } from "../execute"
+
+export const listProjectDirectories = async () => {
+    const files = await readdir("/home/pi/RestNode")
+
+    return files
+}
 
 export const updateGitRepository = async (target?: string) => {
     let command = "git pull"

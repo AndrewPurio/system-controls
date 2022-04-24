@@ -1,7 +1,7 @@
 import { exec, execFile } from "child_process";
 import { promisify } from "util";
 
-export async function execute(command: string): Promise<{ stdout: any, stderr: string }> {
+export async function execute(command: string): Promise<{ stdout: string, stderr: string }> {
     const execute_command = promisify(exec)
 
     return execute_command(command)
