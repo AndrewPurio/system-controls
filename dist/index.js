@@ -18,8 +18,9 @@ app.get("/reset", (request, response) => {
     response.json("Hello World");
 });
 app.get("/update", async (request, response) => {
-    const { stdout } = await (0, system_1.fetchUpdates)();
-    response.json(stdout.split("\n"));
+    await (0, system_1.fetchUpdates)();
+    await (0, system_1.applyUpgrades)();
+    response.json("Success");
 });
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);

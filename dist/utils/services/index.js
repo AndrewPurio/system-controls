@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.reloadProcessManager = exports.updateGitRepository = void 0;
 const execute_1 = require("../execute");
 const updateGitRepository = async (target) => {
-    const command = ["git", "pull"];
+    let command = "git pull";
     if (target)
-        command.push("-C", target);
-    const { stdout, stderr } = await (0, execute_1.execute)(command.join(" "));
+        command = `git -C ${target} pull`;
+    const { stdout, stderr } = await (0, execute_1.execute)(command);
     return { stdout, stderr };
 };
 exports.updateGitRepository = updateGitRepository;

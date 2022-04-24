@@ -11,3 +11,18 @@ export const applyUpgrades = async () => {
 
     return { stdout, stderr }
 }
+
+export const pullChanges = async (targetDirectory?: string) => {
+    let command = "git pull"
+
+    if(targetDirectory)
+        command = `git -C ${targetDirectory} pull`
+
+    const { stdout, stderr } = await execute(command)
+
+    return { stdout, stderr }
+}
+
+export const resetProcess = async () => {
+    
+}

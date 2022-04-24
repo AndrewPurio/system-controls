@@ -1,6 +1,6 @@
 import express from "express"
 import cors from "cors"
-import { fetchUpdates } from "./utils/system"
+import { applyUpgrades, fetchUpdates } from "./utils/system"
 import { scanBLEDevices } from "./utils/bluetooth"
 
 const app = express()
@@ -19,9 +19,10 @@ app.get("/reset", (request, response) => {
 })
 
 app.get("/update", async (request, response) => {
-    const { stdout } = await fetchUpdates()
+    await fetchUpdates()
+    await applyUpgrades()
 
-    response.json( stdout.split("\n") )
+    response.json("Success")
 })
 
 app.listen(port, () => {

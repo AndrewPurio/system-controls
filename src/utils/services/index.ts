@@ -1,12 +1,12 @@
 import { execute } from "../execute"
 
 export const updateGitRepository = async (target?: string) => {
-    const command = ["git", "pull"]
+    let command = "git pull"
 
-    if(target)
-        command.push("-C", target)
+    if (target)
+        command = `git -C ${target} pull`
 
-    const { stdout, stderr } = await execute(command.join(" "))
+    const { stdout, stderr } = await execute(command)
 
     return { stdout, stderr }
 }
