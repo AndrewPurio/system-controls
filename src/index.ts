@@ -1,7 +1,6 @@
 import express from "express"
 import cors from "cors"
 import { applyUpgrades, fetchUpdates } from "./utils/system"
-import { scanBLEDevices } from "./utils/bluetooth"
 import { listProjectDirectories } from "./utils/services"
 
 const app = express()
@@ -10,8 +9,6 @@ const port = 3002
 app.use(cors())
 
 app.get("/", (request, response) => {
-    scanBLEDevices()
-
     response.json("Hello World")
 })
 
