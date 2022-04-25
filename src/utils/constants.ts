@@ -1,0 +1,1 @@
+export const PROJECTS_FOLDER = "/home/pi/RestNode"

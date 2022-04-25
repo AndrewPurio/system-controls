@@ -1,8 +1,9 @@
 import { readdir } from "fs/promises"
+import { PROJECTS_FOLDER } from "../constants"
 import { execute } from "../execute"
 
 export const listProjectDirectories = async () => {
-    const files = await readdir("/home/pi/RestNode")
+    const files = await readdir(PROJECTS_FOLDER)
 
     return files
 }
