@@ -2,11 +2,14 @@ import express from "express"
 import cors from "cors"
 import { applyUpgrades, fetchUpdates } from "./utils/system"
 import { listProjectDirectories, updateGitRepository } from "./utils/services"
-import { bluetooth, discoverDevices } from "./utils/bluetooth"
+import { discoverDevices } from "./utils/bluetooth"
 import { PROJECTS_FOLDER } from "./utils/constants"
+import { getValue, initializeDatabase, redisClient, setValue } from "./utils/redis"
 
 const app = express()
 const port = 3002
+
+initializeDatabase()
 
 app.use(cors())
 
@@ -26,13 +29,19 @@ app.get("/update", async (request, response) => {
     
     for(let index = 0; index < files.length; index++) {
         const dir = files[index]
+
+        console.log("Dir:", dir)
+
+        if(dir === "config")
+            continue
+
         const { stdout } = await updateGitRepository(PROJECTS_FOLDER + "/" + dir)
 
         console.log("Changes:", stdout)
     }
 
     response.json({
-        fetchedUpdates, appliedUpgrades
+        fetchedUpdates, appliedUpgrades, files
     })
 })
 
@@ -43,11 +52,18 @@ app.get("/list/services", async (request, response) => {
 })
 
 app.get("/scan/devices", async (request, response) => {
-    await discoverDevices(bluetooth)
+    await discoverDevices()
 
     response.json("Scanning for Devices...")
 })
 
-app.listen(port, () => {
+app.listen(port, async () => {
     console.log(`App listening at http://localhost:${port}`)
+
+    await setValue()
+    await getValue()
+})
+
+process.on("exit", () => {
+    redisClient.quit()
 })

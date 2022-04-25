@@ -2,7 +2,7 @@ import Bluez from "bluez"
 
 export const bluetooth = new Bluez()
 
-export const deviceListener = (bluetooth: Bluez) => {
+export const deviceListener = () => {
     bluetooth.on("device", async (address, props) => {
         console.log("[New] Device:", address, props.Name)
 
@@ -14,8 +14,8 @@ export const deviceListener = (bluetooth: Bluez) => {
     })
 }
 
-export const discoverDevices = async (bluetooth: Bluez) => {
-    deviceListener(bluetooth)
+export const discoverDevices = async () => {
+    deviceListener()
 
     try {
         await bluetooth.init()
@@ -32,6 +32,6 @@ export const discoverDevices = async (bluetooth: Bluez) => {
     }
 }
 
-export const serialComms = () => {
-
+export const serialComms = async () => {
+    await bluetooth.init()
 }
