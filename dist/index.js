@@ -46,7 +46,6 @@ app.get("/scan/devices", async (request, response) => {
 });
 app.listen(port, async () => {
     console.log(`App listening at http://localhost:${port}`);
-    await (0, redis_1.setValue)();
     await (0, redis_1.getValue)();
 });
 process.on("exit", () => {

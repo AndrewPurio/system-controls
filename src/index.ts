@@ -60,7 +60,6 @@ app.get("/scan/devices", async (request, response) => {
 app.listen(port, async () => {
     console.log(`App listening at http://localhost:${port}`)
 
-    await setValue()
     await getValue()
 })
 
