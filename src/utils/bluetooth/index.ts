@@ -35,3 +35,25 @@ export const discoverDevices = async () => {
 export const serialComms = async () => {
     await bluetooth.init()
 }
+
+export const connectToBluetoothDevice = async (address: string) => {
+    const device = await bluetooth.getDevice(address)
+    const paired = await device.Paired()
+    const name = await device.Name()
+
+    console.log("Name:", name)
+
+    if(!paired) {
+        try {
+            await device.Pair()
+        } catch (error) {
+            throw error
+        }
+    }
+
+    try {
+        await device.ConnectProfile(Bluez.SerialProfile.uuid)
+    } catch (error) {
+        throw error
+    }
+}

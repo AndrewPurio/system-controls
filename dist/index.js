@@ -44,6 +44,21 @@ app.get("/scan/devices", async (request, response) => {
     await (0, bluetooth_1.discoverDevices)();
     response.json("Scanning for Devices...");
 });
+app.get("/bluetooth/connect", async (request, response) => {
+    const { query } = request;
+    const { address } = query;
+    if (!address) {
+        response.statusCode = 400;
+        response.json({
+            message: "Missing address query"
+        });
+        return;
+    }
+    await (0, bluetooth_1.connectToBluetoothDevice)(address);
+    response.json({
+        message: "Success"
+    });
+});
 app.listen(port, async () => {
     console.log(`App listening at http://localhost:${port}`);
     await (0, redis_1.getValue)();
