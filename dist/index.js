@@ -7,13 +7,15 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const system_1 = require("./utils/system");
 const services_1 = require("./utils/services");
-const bluetooth_1 = require("./utils/bluetooth");
 const constants_1 = require("./utils/constants");
 const redis_1 = require("./utils/redis");
+const bluetooth_1 = __importDefault(require("./routes/bluetooth"));
+const bluetooth_2 = require("./utils/bluetooth");
 const app = (0, express_1.default)();
 const port = 3002;
 (0, redis_1.initializeDatabase)();
 app.use((0, cors_1.default)());
+app.use("/bluetooth", bluetooth_1.default);
 app.get("/", (request, response) => {
     response.json("Hello World");
 });
@@ -40,28 +42,15 @@ app.get("/list/services", async (request, response) => {
     const files = await (0, services_1.listProjectDirectories)();
     response.json(files);
 });
-app.get("/scan/devices", async (request, response) => {
-    await (0, bluetooth_1.discoverDevices)();
-    response.json("Scanning for Devices...");
-});
-app.get("/bluetooth/connect", async (request, response) => {
-    const { query } = request;
-    const { address } = query;
-    if (!address) {
-        response.statusCode = 400;
-        response.json({
-            message: "Missing address query"
-        });
-        return;
-    }
-    await (0, bluetooth_1.connectToBluetoothDevice)(address);
-    response.json({
-        message: "Success"
-    });
-});
 app.listen(port, async () => {
     console.log(`App listening at http://localhost:${port}`);
-    await (0, redis_1.getValue)();
+    try {
+        await (0, redis_1.getValue)();
+        await (0, bluetooth_2.initBluetooth)();
+    }
+    catch (error) {
+        console.log(error);
+    }
 });
 process.on("exit", () => {
     redis_1.redisClient.quit();

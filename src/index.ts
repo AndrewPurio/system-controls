@@ -2,9 +2,10 @@ import express from "express"
 import cors from "cors"
 import { applyUpgrades, fetchUpdates } from "./utils/system"
 import { listProjectDirectories, updateGitRepository } from "./utils/services"
-import { connectToBluetoothDevice, discoverDevices } from "./utils/bluetooth"
 import { PROJECTS_FOLDER } from "./utils/constants"
 import { getValue, initializeDatabase, redisClient, setValue } from "./utils/redis"
+import bluetooth from "./routes/bluetooth"
+import { initBluetooth } from "./utils/bluetooth"
 
 const app = express()
 const port = 3002
@@ -12,6 +13,7 @@ const port = 3002
 initializeDatabase()
 
 app.use(cors())
+app.use("/bluetooth", bluetooth)
 
 app.get("/", (request, response) => {
     response.json("Hello World")
@@ -51,37 +53,15 @@ app.get("/list/services", async (request, response) => {
     response.json(files)
 })
 
-app.get("/scan/devices", async (request, response) => {
-    await discoverDevices()
-
-    response.json("Scanning for Devices...")
-})
-
-app.get("/bluetooth/connect", async (request, response) => {
-    const { query } = request
-    const { address } = query
-
-    if(!address) {
-        response.statusCode = 400
-
-        response.json({
-            message: "Missing address query"
-        })
-
-        return
-    }
-
-    await connectToBluetoothDevice(address as string)
-
-    response.json({
-        message: "Success"
-    })
-})
-
 app.listen(port, async () => {
     console.log(`App listening at http://localhost:${port}`)
 
-    await getValue()
+    try {
+        await getValue()
+        await initBluetooth()
+    } catch (error) {
+        console.log(error)
+    }
 })
 
 process.on("exit", () => {
