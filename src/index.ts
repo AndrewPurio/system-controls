@@ -6,6 +6,7 @@ import { PROJECTS_FOLDER } from "./utils/constants"
 import { getValue, initializeDatabase, redisClient, setValue } from "./utils/redis"
 import bluetooth from "./routes/bluetooth"
 import { initBluetooth } from "./utils/bluetooth"
+import { execute } from "./utils/execute"
 
 const app = express()
 const port = 3002
@@ -26,13 +27,14 @@ app.get("/reset", (request, response) => {
 app.get("/update", async (request, response) => {
     const { stdout: fetchedUpdates } = await fetchUpdates()
     const { stdout: appliedUpgrades } = await applyUpgrades()
-
     const files = await listProjectDirectories()
     
+    const { stdout, stderr } = await execute("sudo sh /home/pi/scripts/update_docker_image.sh")
+
+    console.log("Output:", stdout, stderr)
+
     for(let index = 0; index < files.length; index++) {
         const dir = files[index]
-
-        console.log("Dir:", dir)
 
         if(dir === "config")
             continue
