@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAdapterInfo = exports.disconnectDevice = exports.connectToDevice = exports.getDevice = exports.getAdapter = exports.closeBluetoothInterface = exports.initBluetooth = exports.bluetooth = void 0;
+exports.findBluetoothDevice = exports.getAdapterInfo = exports.disconnectDevice = exports.connectToDevice = exports.getDevice = exports.getAdapter = exports.closeBluetoothInterface = exports.initBluetooth = exports.bluetooth = void 0;
 // Reference: https://github.com/WaeCo/node-bluez
 const bluez_1 = __importStar(require("bluez"));
 exports.bluetooth = new bluez_1.default();
@@ -35,8 +35,6 @@ const initBluetooth = async () => {
         await exports.bluetooth.init();
         const agent = new bluez_1.Agent(exports.bluetooth, exports.bluetooth.getUserServiceObject());
         await exports.bluetooth.registerAgent(agent, "NoInputNoOutput");
-        const adapter = await (0, exports.getAdapter)();
-        await adapter.StartDiscovery();
     }
     catch (error) {
         throw error;
@@ -142,3 +140,27 @@ const getAdapterInfo = async () => {
     }
 };
 exports.getAdapterInfo = getAdapterInfo;
+/**
+ * Finds the Bluetooth device given its name
+ *
+ * @param name Bluetooth device name
+ * @returns Bluetooth device info
+ */
+const findBluetoothDevice = async (name) => {
+    try {
+        await exports.bluetooth.init();
+        const adapter = await (0, exports.getAdapter)();
+        await adapter.StartDiscovery();
+        const device = await exports.bluetooth.findDevice((device) => {
+            console.log("Device:", name, device.Name);
+            return device.Name === name;
+        });
+        await adapter.StopDiscovery();
+        return device;
+    }
+    catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+exports.findBluetoothDevice = findBluetoothDevice;

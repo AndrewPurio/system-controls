@@ -11,6 +11,7 @@ const constants_1 = require("./utils/constants");
 const redis_1 = require("./utils/redis");
 const bluetooth_1 = __importDefault(require("./routes/bluetooth"));
 const bluetooth_2 = require("./utils/bluetooth");
+const execute_1 = require("./utils/execute");
 const app = (0, express_1.default)();
 const port = 3002;
 (0, redis_1.initializeDatabase)();
@@ -26,9 +27,10 @@ app.get("/update", async (request, response) => {
     const { stdout: fetchedUpdates } = await (0, system_1.fetchUpdates)();
     const { stdout: appliedUpgrades } = await (0, system_1.applyUpgrades)();
     const files = await (0, services_1.listProjectDirectories)();
+    const { stdout, stderr } = await (0, execute_1.execute)("sudo sh /home/pi/scripts/update_docker_image.sh");
+    console.log("Output:", stdout, stderr);
     for (let index = 0; index < files.length; index++) {
         const dir = files[index];
-        console.log("Dir:", dir);
         if (dir === "config")
             continue;
         const { stdout } = await (0, services_1.updateGitRepository)(constants_1.PROJECTS_FOLDER + "/" + dir);

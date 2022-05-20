@@ -10,20 +10,22 @@ router.get("/", async (request, response) => {
 });
 router.get("/connect", async (request, response) => {
     const { query } = request;
-    const { address } = query;
-    if (!address) {
+    const { name } = query;
+    if (!name) {
         response.statusCode = 400;
         response.json({
-            message: "Missing address query"
+            message: "Missing name query"
         });
         return;
     }
     try {
-        const device = await (0, bluetooth_1.getDevice)(address);
-        const name = await device.Name();
+        const device = await (0, bluetooth_1.findBluetoothDevice)(name);
+        console.log("Device:", device);
+        if (!device)
+            throw Error("Device is not available");
         await (0, bluetooth_1.connectToDevice)(device);
         response.json({
-            message: "Successfully disconnected: " + name
+            message: "Successfully connected: " + name
         });
     }
     catch (e) {
@@ -45,11 +47,14 @@ router.get("/disconnect", async (request, response) => {
         return;
     }
     try {
+        console.log(address);
         const device = await (0, bluetooth_1.getDevice)(address);
         const name = await device.Name();
+        if (!device)
+            throw Error("Device is not available");
         await (0, bluetooth_1.disconnectDevice)(device);
         response.json({
-            message: "Successfully connected to: " + name
+            message: "Successfully disconnected to: " + name
         });
     }
     catch (e) {
@@ -63,6 +68,7 @@ router.get("/disconnect", async (request, response) => {
 router.get("/info", async (request, response) => {
     try {
         const info = await (0, bluetooth_1.getAdapterInfo)();
+        response.json(info);
     }
     catch (e) {
         const { message } = e;
