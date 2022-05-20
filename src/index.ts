@@ -58,6 +58,7 @@ app.listen(port, async () => {
 
     try {
         await getValue()
+
         await initBluetooth()
     } catch (error) {
         console.log(error)

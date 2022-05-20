@@ -60,6 +60,18 @@ router.get("/disconnect", async (request, response) => {
         });
     }
 });
+router.get("/info", async (request, response) => {
+    try {
+        const info = await (0, bluetooth_1.getAdapterInfo)();
+    }
+    catch (e) {
+        const { message } = e;
+        response.statusCode = 500;
+        response.json({
+            message
+        });
+    }
+});
 router.get("/close", async (request, response) => {
     try {
         await (0, bluetooth_1.closeBluetoothInterface)();

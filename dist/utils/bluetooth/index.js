@@ -23,18 +23,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.disconnectDevice = exports.connectToDevice = exports.getDevice = exports.getAdapter = exports.closeBluetoothInterface = exports.initBluetooth = void 0;
+exports.getAdapterInfo = exports.disconnectDevice = exports.connectToDevice = exports.getDevice = exports.getAdapter = exports.closeBluetoothInterface = exports.initBluetooth = exports.bluetooth = void 0;
 // Reference: https://github.com/WaeCo/node-bluez
 const bluez_1 = __importStar(require("bluez"));
-const bluetooth = new bluez_1.default();
+exports.bluetooth = new bluez_1.default();
 /**
  * Initialize bluetooth device discovery to enable connecting to discovered devices
  */
 const initBluetooth = async () => {
     try {
-        await bluetooth.init();
-        const agent = new bluez_1.Agent(bluetooth, bluetooth.getUserServiceObject());
-        await bluetooth.registerAgent(agent, "NoInputNoOutput");
+        await exports.bluetooth.init();
+        const agent = new bluez_1.Agent(exports.bluetooth, exports.bluetooth.getUserServiceObject());
+        await exports.bluetooth.registerAgent(agent, "NoInputNoOutput");
         const adapter = await (0, exports.getAdapter)();
         await adapter.StartDiscovery();
     }
@@ -48,7 +48,7 @@ exports.initBluetooth = initBluetooth;
  */
 const closeBluetoothInterface = async () => {
     try {
-        await bluetooth.init();
+        await exports.bluetooth.init();
         const adapter = await (0, exports.getAdapter)();
         await adapter.StopDiscovery();
     }
@@ -62,8 +62,8 @@ exports.closeBluetoothInterface = closeBluetoothInterface;
  */
 const getAdapter = async () => {
     try {
-        await bluetooth.init();
-        const adapter = await bluetooth.getAdapter();
+        await exports.bluetooth.init();
+        const adapter = await exports.bluetooth.getAdapter();
         return adapter;
     }
     catch (error) {
@@ -79,8 +79,8 @@ exports.getAdapter = getAdapter;
  */
 const getDevice = async (address) => {
     try {
-        await bluetooth.init();
-        const device = bluetooth.getDevice(address);
+        await exports.bluetooth.init();
+        const device = exports.bluetooth.getDevice(address);
         return device;
     }
     catch (error) {
@@ -124,3 +124,21 @@ const disconnectDevice = async (device) => {
     }
 };
 exports.disconnectDevice = disconnectDevice;
+/**
+ * Get bluetooth adapter name and MAC address
+ */
+const getAdapterInfo = async () => {
+    try {
+        await exports.bluetooth.init();
+        const adapter = await (0, exports.getAdapter)();
+        const name = await adapter.Name();
+        const address = await adapter.Address();
+        return {
+            address, name
+        };
+    }
+    catch (error) {
+        throw error;
+    }
+};
+exports.getAdapterInfo = getAdapterInfo;

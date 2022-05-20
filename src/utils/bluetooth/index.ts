@@ -1,7 +1,7 @@
 // Reference: https://github.com/WaeCo/node-bluez
 import Bluez, { Agent } from "bluez";
 
-const bluetooth = new Bluez()
+export const bluetooth = new Bluez()
 
 /**
  * Initialize bluetooth device discovery to enable connecting to discovered devices
@@ -12,10 +12,6 @@ export const initBluetooth = async () => {
         const agent = new Agent(bluetooth, bluetooth.getUserServiceObject())
     
         await bluetooth.registerAgent(agent, "NoInputNoOutput")
-
-        const adapter = await getAdapter()
-
-        await adapter.StartDiscovery()
     } catch (error) {
         throw error
     }
@@ -48,7 +44,6 @@ export const getAdapter = async () => {
     } catch (error) {
         throw error
     }
-    
 }
 
 /**
@@ -103,6 +98,52 @@ export const disconnectDevice = async (device: Bluez.Device) => {
         await adapter.RemoveDevice(device)
     } catch (error) {
         console.log(error)
+        throw error
+    }
+}
+
+/**
+ * Get bluetooth adapter name and MAC address
+ */
+export const getAdapterInfo = async () => {
+    try {
+        await bluetooth.init()
+        const adapter = await getAdapter()
+        const name = await adapter.Name()
+        const address = await adapter.Address()
+
+        return {
+            address, name
+        }
+    } catch (error) {
+        throw error
+    }
+}
+
+/**
+ * Finds the Bluetooth device given its name
+ * 
+ * @param name Bluetooth device name
+ * @returns Bluetooth device info
+ */
+export const findBluetoothDevice = async (name: string) => {
+    try {
+        await bluetooth.init()
+        const adapter = await getAdapter()
+        
+        await adapter.StartDiscovery()
+
+        const device = await bluetooth.findDevice((device) => {
+            console.log("Device:", name, device.Name)
+
+            return device.Name === name
+        })
+
+        await adapter.StopDiscovery()
+        return device
+    } catch (error) {
+        console.log(error)
+
         throw error
     }
 }

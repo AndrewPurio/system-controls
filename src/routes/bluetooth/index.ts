@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { closeBluetoothInterface, connectToDevice, disconnectDevice, getDevice } from "../../utils/bluetooth";
+import { closeBluetoothInterface, connectToDevice, disconnectDevice, findBluetoothDevice, getAdapterInfo, getDevice } from "../../utils/bluetooth";
 
 const router = Router()
 
@@ -11,26 +11,30 @@ router.get("/", async (request, response) => {
 
 router.get("/connect", async (request, response) => {
     const { query } = request
-    const { address } = query
+    const { name } = query
 
-    if(!address) {
+    if(!name) {
         response.statusCode = 400
 
         response.json({
-            message: "Missing address query"
+            message: "Missing name query"
         })
 
         return
     }
 
     try {
-        const device = await getDevice(address as string)
-        const name = await device.Name()
+        const device = await findBluetoothDevice(name as string)
+
+        console.log("Device:", device)
+
+        if(!device)
+            throw Error("Device is not available")
 
         await connectToDevice(device)
 
         response.json({
-            message: "Successfully disconnected: " + name
+            message: "Successfully connected: " + name
         })
     } catch (e) {
         const { message } = e as Error
@@ -58,18 +62,38 @@ router.get("/disconnect", async (request, response) => {
     }
 
     try {
+        console.log(address)
+
         const device = await getDevice(address as string)
         const name = await device.Name()
 
+        if(!device)
+            throw Error("Device is not available")
+            
         await disconnectDevice(device)
 
         response.json({
-            message: "Successfully connected to: " + name
+            message: "Successfully disconnected to: " + name
         })
     } catch (e) {
         const { message } = e as Error
 
         response.statusCode = 400
+
+        response.json({
+            message
+        })
+    }
+})
+
+router.get("/info", async (request, response) => {
+    try {
+        const info = await getAdapterInfo()
+
+        response.json(info)
+    } catch (e) {
+        const { message } = e as Error
+        response.statusCode = 500
 
         response.json({
             message
