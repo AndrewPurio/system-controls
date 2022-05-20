@@ -3,12 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resetProcess = exports.pullChanges = exports.applyUpgrades = exports.fetchUpdates = void 0;
 const execute_1 = require("../execute");
 const fetchUpdates = async () => {
-    const { stdout, stderr } = await (0, execute_1.execute)("sudo apt update");
+    const { stdout, stderr } = await (0, execute_1.execute)("sudo apt-get update");
     return { stdout, stderr };
 };
 exports.fetchUpdates = fetchUpdates;
 const applyUpgrades = async () => {
-    const { stdout, stderr } = await (0, execute_1.execute)("sudo apt upgrade -y");
+    const { stdout, stderr } = await (0, execute_1.execute)("sudo apt-get upgrade -y");
     return { stdout, stderr };
 };
 exports.applyUpgrades = applyUpgrades;
